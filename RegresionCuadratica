@@ -1,0 +1,84 @@
+public class RegresionCuadratica {
+
+    //PARTE 1
+    public static double[] calcularRegresion(double[][] datos) {
+        // Calcular las sumas necesarias
+        double sumX = 0, sumX2 = 0, sumX3 = 0, sumX4 = 0, sumY = 0, sumXY = 0, sumX2Y = 0;
+        int n = datos.length;
+
+        // Calcular las sumas de X, X^2, X^3, X^4, Y, XY, X^2Y
+        for (int i = 0; i < n; i++) {
+            double x = datos[i][0];
+            double y = datos[i][1];
+            sumX += x;
+            sumX2 += x * x;
+            sumX3 += x * x * x;
+            sumX4 += x * x * x * x;
+            sumY += y;
+            sumXY += x * y;
+            sumX2Y += x * x * y;
+        }
+        /////////////////////////////////////////////////////
+
+        //PARTE 2
+
+        // Crear las matrices del sistema de ecuaciones
+        double[][] A = {
+                {n, sumX, sumX2},
+                {sumX, sumX2, sumX3},
+                {sumX2, sumX3, sumX4}
+        };
+
+        double[] B = {sumY, sumXY, sumX2Y};
+
+
+        return sacardeterminantes(A, B);
+    }
+    ////////////////////////////////////////////////////
+    //PARTE 3
+    private static double[] sacardeterminantes(double[][] A, double[] B) {
+        double detA = determinante(A);
+        double[] X = new double[3];
+
+
+        double[][] A1 = remplazarcolumnas(A, B, 0);
+        double[][] A2 = remplazarcolumnas(A, B, 1);
+        double[][] A3 = remplazarcolumnas(A, B, 2);
+
+        X[0] = determinante(A1) / detA;
+        X[1] = determinante(A2) / detA;
+        X[2] = determinante(A3) / detA;
+
+        return X;
+    }
+    ///////////////////////////////////////////////////////////////
+    //PARTE 4
+    private static double determinante(double[][] A) {
+        return  A[0][0] * (A[1][1] * A[2][2] - A[1][2] * A[2][1]) -
+                A[0][1] * (A[1][0] * A[2][2] - A[1][2] * A[2][0]) +
+                A[0][2] * (A[1][0] * A[2][1] - A[1][1] * A[2][0]);
+    }
+////////////////////////////////////////////////////////////////
+    //PARTE 5
+
+    private static double[][] remplazarcolumnas(double[][] A, double[] B, int col) {
+        double[][] nuevaMatriz = new double[3][3];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (j == col) {
+                    nuevaMatriz[i][j] = B[i];
+                } else {
+                    nuevaMatriz[i][j] = A[i][j];
+                }
+            }
+        }
+        return nuevaMatriz;
+    }
+    //////////////////////////////////////////////////
+    //PARTE 6
+    public static double predicciones(double X, double[] prediccion) {
+        double a = prediccion[0];
+        double b = prediccion[1];
+        double c = prediccion[2];
+        return  a * X * X + b * X + c;
+    }
